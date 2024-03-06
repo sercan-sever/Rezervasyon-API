@@ -2,14 +2,17 @@
 
 namespace App\Services\Repositories\HotelRepository;
 
+use App\Http\Resources\District\DistrictHotelResource;
+use App\Http\Resources\Hotel\HotelRelationResource;
 use App\Http\Resources\Hotel\HotelResource;
 use App\Models\Hotel;
 use App\Services\Interfaces\HotelInterface\CustomerHotelInterface;
+use App\Services\Repositories\DistrictRepository\BaseDistrictRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
-class CustomerHotelRepository implements CustomerHotelInterface
+class CustomerHotelRepository extends BaseHotelRepository implements CustomerHotelInterface
 {
     private array $select_ = ['id', 'district_id', 'name', 'slug'];
     private array $with_ = ['district'];
@@ -42,6 +45,41 @@ class CustomerHotelRepository implements CustomerHotelInterface
      */
     public function getHotelDetail(int $hotelID): JsonResponse
     {
-        return response()->json();
+        $hotel = $this->getById(id: $hotelID);
+
+        if (empty($hotel))
+            return response()->json(['success' => false, 'message' => 'Böyle Bir Otel Mevcut Değil !!!'], Response::HTTP_NOT_FOUND);
+
+
+        return response()->json([
+            'success' => true,
+            'message' => $hotel?->name . ' Detayı',
+            'data' => [
+                'hotel' => new HotelRelationResource(resource: $hotel),
+            ]
+        ], Response::HTTP_OK);
+    }
+
+
+    /**
+     * @param int $hotelID
+     *
+     * @return JsonResponse
+     */
+    public function getDistricHotelList(int $districID): JsonResponse
+    {
+        $distric = (new BaseDistrictRepository())->getById(id: $districID);
+
+        if (empty($distric))
+            return response()->json(['success' => false, 'message' => 'Böyle Bir Bölge Mevcut Değil !!!'], Response::HTTP_NOT_FOUND);
+
+
+        return response()->json([
+            'success' => true,
+            'message' => $distric?->name . ' Detayı',
+            'data' => [
+                'hotel' => new DistrictHotelResource(resource: $distric),
+            ]
+        ], Response::HTTP_OK);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Services\Repositories\RoomRepository;
 
+use App\Http\Resources\Room\RoomConceptResource;
 use App\Http\Resources\Room\RoomResource;
 use App\Models\Room;
 use App\Services\Interfaces\RoomInterface\AdminRoomInterface;
@@ -9,17 +10,14 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
-class AdminRoomRepository implements AdminRoomInterface
+class AdminRoomRepository extends BaseRoomRepository implements AdminRoomInterface
 {
-    private array $select_ = ['id', 'hotel_id', 'name'];
-    private array $with_ = ['hotel'];
-
     /**
      * @return JsonResponse
      */
     public function getAll(): JsonResponse
     {
-        $rooms = Room::query()->select($this->select_)->with($this->with_)->get();
+        $rooms = $this->getModels();
 
 
         if ($rooms->isEmpty())
@@ -81,10 +79,11 @@ class AdminRoomRepository implements AdminRoomInterface
             'success' => true,
             'message' => $room?->name . ' Detayı',
             'data' => [
-                'room' => new RoomResource(resource: $room),
+                'room' => new RoomConceptResource(resource: $room),
             ]
         ], Response::HTTP_OK);
     }
+
 
     /**
      * @param array|Collection $data_
@@ -149,15 +148,5 @@ class AdminRoomRepository implements AdminRoomInterface
 
 
         return response()->json(['success' => true, 'message' => 'Başarıyla Silindi'], Response::HTTP_OK);
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return Room|null
-     */
-    public function getById(int $id): ?Room
-    {
-        return Room::query()->select($this->select_)->with($this->with_)->find($id);
     }
 }

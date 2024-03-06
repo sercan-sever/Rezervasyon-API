@@ -31,6 +31,14 @@ class CustomerHotelController extends Controller
     /**
      * @return JsonResponse
      */
+    public function districHotelList(int $districId): JsonResponse
+    {
+        return $this->customerHotel->getDistricHotelList(districID: $districId);
+    }
+
+    /**
+     * @return JsonResponse
+     */
     public function hotelDetail(int $id): JsonResponse
     {
         return $this->customerHotel->getHotelDetail(hotelID: $id);

@@ -10,18 +10,14 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
-class AdminConceptRepository implements AdminConceptInterface
+class AdminConceptRepository extends BaseConceptRepository implements AdminConceptInterface
 {
-    private array $select_ = ['id', 'hotel_id', 'room_id', 'price', 'name', 'open_for_sale'];
-    private array $with_ = ['hotel', 'room'];
-
-
     /**
      * @return JsonResponse
      */
     public function getAll(): JsonResponse
     {
-        $concepts = Concept::query()->select($this->select_)->with($this->with_)->get();
+        $concepts = $this->getModels();
 
 
         if ($concepts->isEmpty())
@@ -179,16 +175,5 @@ class AdminConceptRepository implements AdminConceptInterface
 
 
         return response()->json(['success' => true, 'message' => 'Başarıyla Silindi'], Response::HTTP_OK);
-    }
-
-
-    /**
-     * @param int $id
-     *
-     * @return Concept|null
-     */
-    public function getById(int $id): ?Concept
-    {
-        return Concept::query()->select($this->select_)->with($this->with_)->find($id);
     }
 }

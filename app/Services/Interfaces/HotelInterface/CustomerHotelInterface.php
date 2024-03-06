@@ -13,4 +13,12 @@ interface CustomerHotelInterface extends ListInterface
      * @return JsonResponse
      */
     public function getHotelDetail(int $hotelID): JsonResponse;
+
+
+    /**
+     * @param int $hotelID
+     *
+     * @return JsonResponse
+     */
+    public function getDistricHotelList(int $districID): JsonResponse;
 }

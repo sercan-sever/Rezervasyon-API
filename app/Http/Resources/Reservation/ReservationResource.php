@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Reservation;
 
+use App\Http\Resources\Concept\ConceptNotRelationResource;
 use App\Http\Resources\Customer\CustomerResource;
 use App\Http\Resources\Hotel\HotelResource;
 use App\Http\Resources\Room\RoomNotRelationResource;
@@ -23,7 +24,7 @@ class ReservationResource extends JsonResource
             'customer'        => new CustomerResource(resource: $this->customer),
             'hotel'           => new HotelResource(resource: $this->hotel),
             'room'            => new RoomNotRelationResource(resource: $this->room),
-            'concept'         => new CustomerResource(resource: $this->customer),
+            'concept'         => new ConceptNotRelationResource(resource: $this->concept),
             'total_nights'    => $this->total_nights,
             'price_per_night' => Number::currency($this->price_per_night, in: config('app.locale_price'), locale: config('app.locale')),
             'total_price'     => Number::currency($this->total_price, in: config('app.locale_price'), locale: config('app.locale')),

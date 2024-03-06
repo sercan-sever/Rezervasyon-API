@@ -3,9 +3,8 @@
 namespace App\Services\Repositories\ReservationRepository;
 
 use App\Http\Resources\Reservation\ReservationResource;
-use App\Jobs\ProcessReservation;
 use App\Models\Reservation;
-use App\Services\Interfaces\ReservationInterface\AdminReservationInterface;
+use App\Services\Interfaces\ReservationInterface\CustomerReservationInterface;
 use App\Services\Repositories\ConceptRepository\AdminConceptRepository;
 use App\Services\Repositories\UserRepository\CustomerRepository;
 use App\Traits\ReservationPriceCalculation;
@@ -13,7 +12,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
-class AdminReservationRepository extends BaseReservationRepository implements AdminReservationInterface
+class CustomerReservationRepository extends BaseReservationRepository implements CustomerReservationInterface
 {
     use ReservationPriceCalculation;
 
@@ -22,7 +21,7 @@ class AdminReservationRepository extends BaseReservationRepository implements Ad
      */
     public function getAll(): JsonResponse
     {
-        $reservations = $this->getModels();
+        $reservations = $this->getByCustomerRezervations(customerID: auth()->id());
 
         if ($reservations->isEmpty())
             return response()->json(['success' => false, 'message' => 'Bir Rezervasyon Bulunamadı !!!'], Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -37,6 +36,7 @@ class AdminReservationRepository extends BaseReservationRepository implements Ad
         ], Response::HTTP_OK);
     }
 
+
     /**
      * @param array|Collection $data_
      *
@@ -46,7 +46,7 @@ class AdminReservationRepository extends BaseReservationRepository implements Ad
     {
         $customer = (new CustomerRepository())->getById(id: $data_['customer_id']);
 
-        if (empty($customer))
+        if (empty($customer) || ($customer?->id != auth()->id()))
             return response()->json([
                 'success' => false,
                 'message' => 'Kullanıcı Kayıtlarımız İle Uyuşmuyor !!!'
@@ -104,33 +104,11 @@ class AdminReservationRepository extends BaseReservationRepository implements Ad
      *
      * @return JsonResponse
      */
-    public function customerReservations(int $customerID): JsonResponse
-    {
-        $reservations = $this->getByCustomerRezervations(customerID: $customerID);
-
-        if ($reservations->isEmpty())
-            return response()->json(['success' => false, 'message' => 'Bu Kullanıcıya Ait Bir Rezervasyon Mevcut Değil !!!'], Response::HTTP_NOT_FOUND);
-
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Rezervasyonlar',
-            'data' => [
-                'reservations' => ReservationResource::collection(resource: $reservations),
-            ]
-        ], Response::HTTP_OK);
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return JsonResponse
-     */
     public function read(int $id): JsonResponse
     {
         $reservation = $this->getById(id: $id);
 
-        if (empty($reservation))
+        if (empty($reservation) || ($reservation?->customer_id != auth()->id()))
             return response()->json(['success' => false, 'message' => 'Böyle Bir Rezervasyon Mevcut Değil !!!'], Response::HTTP_NOT_FOUND);
 
 
@@ -153,9 +131,8 @@ class AdminReservationRepository extends BaseReservationRepository implements Ad
     {
         $reservation = $this->getById(id: $id);
 
-        if (empty($reservation))
+        if (empty($reservation) || ($reservation?->customer_id != auth()->id()))
             return response()->json(['success' => false, 'message' => 'Böyle Bir Rezervasyon Mevcut Değil !!!'], Response::HTTP_NOT_FOUND);
-
 
 
         if (!$reservation->delete())
@@ -165,8 +142,6 @@ class AdminReservationRepository extends BaseReservationRepository implements Ad
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
 
 
-
         return response()->json(['success' => true, 'message' => 'Başarıyla Silindi'], Response::HTTP_OK);
     }
-
 }

@@ -2,8 +2,6 @@
 
 namespace App\Traits;
 
-use Ramsey\Uuid\Type\Decimal;
-
 trait ReservationPriceCalculation
 {
     /**

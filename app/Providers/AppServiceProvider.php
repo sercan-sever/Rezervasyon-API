@@ -12,12 +12,14 @@ use App\Services\Interfaces\DistrictInterface\AdminDistrictInterface;
 use App\Services\Interfaces\HotelInterface\AdminHotelInterface;
 use App\Services\Interfaces\HotelInterface\CustomerHotelInterface;
 use App\Services\Interfaces\ReservationInterface\AdminReservationInterface;
+use App\Services\Interfaces\ReservationInterface\CustomerReservationInterface;
 use App\Services\Interfaces\RoomInterface\AdminRoomInterface;
 use App\Services\Repositories\ConceptRepository\AdminConceptRepository;
 use App\Services\Repositories\DistrictRepository\AdminDistrictRepository;
 use App\Services\Repositories\HotelRepository\AdminHotelRepository;
 use App\Services\Repositories\HotelRepository\CustomerHotelRepository;
 use App\Services\Repositories\ReservationRepository\AdminReservationRepository;
+use App\Services\Repositories\ReservationRepository\CustomerReservationRepository;
 use App\Services\Repositories\RoomRepository\AdminRoomRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -49,6 +51,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Admin Reservations
         $this->app->bind(AdminReservationInterface::class, AdminReservationRepository::class);
+        // Customer Reservations
+        $this->app->bind(CustomerReservationInterface::class, CustomerReservationRepository::class);
     }
 
     /**

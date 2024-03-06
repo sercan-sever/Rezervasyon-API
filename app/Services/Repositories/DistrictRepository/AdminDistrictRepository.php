@@ -9,16 +9,15 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
-class AdminDistrictRepository implements AdminDistrictInterface
+class AdminDistrictRepository extends BaseDistrictRepository implements AdminDistrictInterface
 {
-    private array $select_ = ['id', 'name'];
 
     /**
      * @return JsonResponse
      */
     public function getAll(): JsonResponse
     {
-        $districts = District::query()->select($this->select_)->get();
+        $districts = $this->getModels();
 
         if ($districts->isEmpty())
             return response()->json([
@@ -139,16 +138,5 @@ class AdminDistrictRepository implements AdminDistrictInterface
 
 
         return response()->json(['success' => true, 'message' => 'Başarıyla Silindi'], Response::HTTP_OK);
-    }
-
-
-    /**
-     * @param int $id
-     *
-     * @return District|null
-     */
-    public function getById(int $id): ?District
-    {
-        return District::query()->select($this->select_)->find($id);
     }
 }

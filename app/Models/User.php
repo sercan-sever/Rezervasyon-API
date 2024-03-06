@@ -6,18 +6,14 @@ namespace App\Models;
 
 use App\Enums\RoleType;
 use App\Notifications\Customer\ForgotPasswordCustomerNotification;
-use App\Observers\UserObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-
-
-#[ObservedBy([UserObserver::class])]
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
@@ -77,6 +73,14 @@ class User extends Authenticatable
     public function since(): string
     {
         return $this->created_at->format('Y-m-d');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
     }
 
 

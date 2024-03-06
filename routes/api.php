@@ -10,6 +10,7 @@ use App\Http\Controllers\API\V1\Admin\Reservation\AdminReservationController;
 use App\Http\Controllers\API\V1\Admin\Room\AdminRoomController;
 use App\Http\Controllers\API\V1\Customer\Auth\CustomerAuthenticateController;
 use App\Http\Controllers\API\V1\Customer\Hotel\CustomerHotelController;
+use App\Http\Controllers\API\V1\Customer\Reservation\CustomerReservationController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -35,17 +36,29 @@ Route::prefix('v1')->name('v1.')->group(function () {
         });
 
         Route::middleware(['auth:api', 'role:' . RoleType::getByUsersRole()])->group(function () {
+            // GET
             Route::get('/home', function () {
                 return response()->json(['success' => true, 'message' => 'Müşteri Olarak Giriş Yaptın ' . auth()->user()->name]);
             })->name('home');
 
 
-            Route::controller(CustomerHotelController::class)->group(function(){
+            Route::controller(CustomerHotelController::class)->group(function () {
+                // GET
+                Route::get('/hotel/distric/{districId}/lists', 'districHotelList')->name('distric.hotel.lists');
                 Route::get('/hotel', 'getAll')->name('hotel');
+                Route::get('/hotel/{id}/detail', 'hotelDetail')->name('hotel.detail');
+            });
+
+            Route::controller(CustomerReservationController::class)->group(function () {
+                // GET
+                Route::get('/reservation', 'getAll')->name('reservation');
+                Route::get('/reservation/{id}/detail', 'detail')->name('reservation.detail');
+                Route::get('/reservation/{id}/delete', 'delete')->name('reservation.delete');
+
+                // POST
+                Route::post('/reservation/create', 'create')->name('reservation.create');
             });
         });
-
-
     });
 
     // Admin
