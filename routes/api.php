@@ -69,7 +69,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
             Route::get('/logout', 'logout')->middleware(['auth:api'])->name('logout');
         });
 
-        Route::middleware(['auth:api', 'role:' . RoleType::getByAdminRole()])->group(function () {
+        Route::middleware(['auth:api'])->group(function () {
             Route::get('/home', function () {
                 return response()->json(['success' => true, 'message' => 'Yönetici Olarak Giriş Yaptın ' . auth()->user()->name]);
             })->name('home');

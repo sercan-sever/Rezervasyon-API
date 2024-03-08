@@ -78,7 +78,7 @@ class CustomerHotelRepository extends BaseHotelRepository implements CustomerHot
             'success' => true,
             'message' => $distric?->name . ' Detayı',
             'data' => [
-                'hotel' => new DistrictHotelResource(resource: $distric),
+                'district' => new DistrictHotelResource(resource: $distric),
             ]
         ], Response::HTTP_OK);
     }

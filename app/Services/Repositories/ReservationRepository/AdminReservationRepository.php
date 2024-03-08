@@ -3,10 +3,10 @@
 namespace App\Services\Repositories\ReservationRepository;
 
 use App\Http\Resources\Reservation\ReservationResource;
-use App\Jobs\ProcessReservation;
 use App\Models\Reservation;
 use App\Services\Interfaces\ReservationInterface\AdminReservationInterface;
 use App\Services\Repositories\ConceptRepository\AdminConceptRepository;
+use App\Services\Repositories\DiscountRepository\CustomerDiscountRepository;
 use App\Services\Repositories\UserRepository\CustomerRepository;
 use App\Traits\ReservationPriceCalculation;
 use Illuminate\Database\Eloquent\Collection;
@@ -83,19 +83,25 @@ class AdminReservationRepository extends BaseReservationRepository implements Ad
         ]);
 
 
-        if (empty($reservation))
-            return response()->json([
-                'success' => false,
-                'message' => 'Rezervasyon İşleminde Bir Sorun Oluştu. Lütfen Girişleri Kontrol Ederek Tekrar Deneyiniz !!!'
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        $discount = (new CustomerDiscountRepository(reservation: $reservation))->calculateDiscount();
 
+        /**
+         *
+         * Modelin resource içerisinde relation alanını güncellemesi için yapılmıştır.
+         * Aksi taktirde bir önceki relation verisini göstermektedir.
+         *
+         */
+        $reservation->refresh();
+
+
+        $discount_ = !empty($discount)
+            ? ['discount_response' => $discount, 'reservation' => new ReservationResource(resource: $reservation)]
+            : ['reservation' => new ReservationResource(resource: $reservation)];
 
         return response()->json([
             'success' => true,
             'message' => 'Başarıyla Rezervasyon Oluşturuldu.',
-            'data' => [
-                'reservation' => new ReservationResource(resource: $reservation),
-            ]
+            'data' => $discount_
         ], Response::HTTP_OK);
     }
 
@@ -168,5 +174,4 @@ class AdminReservationRepository extends BaseReservationRepository implements Ad
 
         return response()->json(['success' => true, 'message' => 'Başarıyla Silindi'], Response::HTTP_OK);
     }
-
 }

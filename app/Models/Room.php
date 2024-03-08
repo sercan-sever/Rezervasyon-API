@@ -38,4 +38,12 @@ class Room extends Model
     {
         return $this->hasMany(Concept::class);
     }
+
+    /**
+     * @return HasMany
+     */
+    public function conceptMinPrice(): HasMany
+    {
+        return $this->hasMany(Concept::class)->orderBy('price', 'ASC');
+    }
 }
