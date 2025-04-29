@@ -1,4 +1,4 @@
-<h1 align="center">Otel Fiyat Draft Work</h1>
+<h1 align="center">Rezervasyon API</h1>
 
 ###
 
